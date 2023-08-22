@@ -1,0 +1,55 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div class="container">
+    {% if user.is_authenticated %}
+        <form action="{% url 'send' %}" method="post">
+            {% csrf_token %}
+            <div class="post">
+                <h4>New Post</h4>
+                <input type="text" class="textbox" name="text" placeholder="{{ text }}" autocomplete="off">
+                <br>
+                <input class="btn btn-primary" type="submit" value="Post">
+            </div>
+        </form>
+    {% endif %}
+
+
+    {% for post in currentPage %}
+        <div class="post">
+            <div class="editContainer">
+                <a href="{% url 'profile' post.userPerson.username %}"><h5>{{ post.userPerson.username }}</h5></a>
+                {% if user == post.userPerson %}
+                    <button id="{{post.id}}" class="edit">Edit</button>
+                {% endif %}
+             </div>
+            <p id="content{{post.id}}">{{ post.content }}</p>
+            <form action="{% url 'send' %}" method="post" id="edit{{post.id}}" class="editText" hidden>
+                {% csrf_token %}
+                <input type="text" class="textbox" name="text" value="{{ post.content }}" autocomplete="off"><br>
+                <input class="btn btn-primary" type="submit" value="Save">
+            </form>
+            <p>{{ post.date|date:"F j, Y, H:i A" }}</p>
+            <div class="likeViewer"><p id="likeCount{{post.id}}" post-likes="{{post.likes}}">{{ post.likes }} Likes</p></div>
+            <div class="likeSection" id="likeSection{{post.id}}">
+                <button post-id="{{post.id}}" action-type="like" class="like-button">Like</button>
+                <button post-id="{{post.id}}" action-type="unlike" class="like-button">Unlike</button>
+            </div>   
+        </div>
+    {% endfor %}
+
+
+    {% if hasPrev %}
+        <form action="{% url 'previous' pageNumber %}" method="post">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Previous">
+        </form>
+    {% endif %}
+    {% if hasNext %}
+    <form action="{% url 'next' pageNumber %}" method="post">
+        {% csrf_token %}
+        <input class="btn btn-primary" type="submit" value="Next">
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
