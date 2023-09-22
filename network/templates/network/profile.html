@@ -1,0 +1,46 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h1>{{ current_user }}</h1>
+    <h4>{{ followerCount }} followers</h4>
+    <h4>{{ followingCount }} following</h4>
+    
+    {% if user.is_authenticated %} 
+        {% if user != current_user %} 
+            {% if isFollowing == True %}
+                <form action="{% url 'unfollow' current_user %}" method="post">
+                    {% csrf_token %}
+                    <input class="btn btn-primary" type="submit" value="Unfollow">
+                </form>
+            {% else %}
+                <form action="{% url 'follow' current_user %}" method="post">
+                    {% csrf_token %}
+                    <input class="btn btn-primary" type="submit" value="Follow">
+                </form>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    <h4>Posts</h4>
+    {% for post in posts %} 
+        <div class="post">
+            <div class="editContainer">
+                <a href="{% url 'profile' current_user.username %}" ><h5>{{ post.userPerson }} </h5></a>
+                {% if user == post.userPerson %}
+                    <button id="{{post.id}}" class="edit">Edit</button>
+                {% endif %}
+            </div>
+            <p id="content{{post.id}}">{{ post.content }}</p>
+            <form action="{% url 'profile' current_user.username %}" method="post" id="edit{{post.id}}" class="editText" hidden>
+                {% csrf_token %}
+                <input type="text" class="textbox" name="text" value="{{ post.content }}" autocomplete="off"><br>
+                <input class="btn btn-primary" type="submit" value="Save">
+            </form>
+            <p>{{ post.date|date:"F j, Y, H:i A" }}</p>
+            <p id="likeCount{{post.id}}">{{ post.likes }} likes</p>
+            <div class="likeSection" id="likeSection{{post.id}}">
+                <button value="Like">Like</button>
+                <button>Unlike</button>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
