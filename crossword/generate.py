@@ -224,14 +224,32 @@ class CrosswordCreator():
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        """
+    
         # A dictionary that maps each value in var to the number of values it removes
         valToScore = {}
-        # For each variable
+        # Neighbors with the variable : overlap tuple
+        neighbors = {
+            neighbor : self.crossword.overlaps[var, neighbor]
+            for neighbor in self.crossword.neighbors(var)
+        }
+        
+        # For each value in the variable
         for value in self.domains[var]:
-            # For each other variable, if it's not in assignment and overlaps, add
-            for variable in self.domains:
-        """
+            # Initialize the value in the list with a score of 0
+            valToScore[value] = 0
+            # For each neighbor variable in neighbors
+            for neighbor in neighbors:
+                # Save the overlap, which is the value in neighbors
+                overlap = neighbors[neighbor]
+                # For each value in the neighboring variable
+                for neighboringVal in self.domains[neighbor]:
+                    # If the overlap is not the same, they're not compatible, 
+                    # and we add 1 to the val to score
+                    if value[overlap[0]] != neighboringVal[overlap[1]]:
+                        valToScore[value] += 1
+        sortedVals = [key for key, value in sorted(valToScore.items(), key=lambda x: x[1])]
+        return sortedVals
+
         
         # Doing without the heuristic for now
         # Return list of values in var's domain
