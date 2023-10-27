@@ -265,13 +265,25 @@ class CrosswordCreator():
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
+        # var is a variable mapped to its domain length
+        currentVar = None
+        domainLength = 9999
         # Get a list of all variables
         variables = self.crossword.variables
-        # If the variable isn't already assigned, return it
+        # If the variable isn't already assigned
         for variable in variables:
-            if variable not in assignment:
-                # Arbitrary value for right now
-                return variable
+            otherDomainLength = len(self.domains[variable])
+            # If the amount of values the variable has is less than the current smallest
+            if (variable not in assignment) and (otherDomainLength < domainLength):
+                currentVar = variable
+                domainLength = otherDomainLength
+            # If the lengths are equal:
+            if otherDomainLength == domainLength:
+                # If the new variable has more neighbors
+                if len(self.crossword.neighbors(currentVar)) < len(self.crossword.neighbors(variable)):
+                    currentVar = variable
+        return currentVar
+                
         
 
     def backtrack(self, assignment):
@@ -299,12 +311,12 @@ class CrosswordCreator():
                 # get the result of backtracking
                 result = self.backtrack(assignment=assignment)
                 # If this result does not fail, return it
-                if result != False:
+                if result != None:
                     return result
             # If it did fail, remove the variable pair from assignment and try another one (loop back)
             del assignment[var]
         # If no value in any variable satisfies the problem, return failure
-        return False
+        return None
 
 def main():
 
